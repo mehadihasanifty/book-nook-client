@@ -1,7 +1,9 @@
 @import "tailwindcss";
+@import "@heroui/styles";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
@@ -47,6 +49,42 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* BookNook brand palette — use as bg-forest, text-brass, bg-lime, etc. */
+@theme {
+  --color-forest: #174d38;
+  --color-forest-deep: #103b2b;
+  --color-forest-dark: #0e4630;
+  --color-pine: #245e45;
+  --color-moss: #123b2c;
+  --color-night: #071f17;
+  --color-shade: #0e241c;
+
+  --color-parchment: #fffefa;
+  --color-cream: #f8f6f0;
+  --color-sand: #f4f4f0;
+  --color-sandstone: #f3e5d6;
+  --color-paper: #f3b54a;
+
+  --color-honey: #f3b54a;
+  --color-brass: #d5b477;
+  --color-gold: #c49a5a;
+  --color-bark: #a18a62;
+
+  --color-lime: #c5ef70;
+  --color-leaf: #94ec8d;
+  --color-clay: #b64c43;
+  --color-ember: #963d35;
+
+  --color-ink: #1d241d;
+  --color-chartreuse-ink: #173d2d;
+
+  --shadow-float: 0 18px 45px rgb(23 77 56 / 0.12);
+  --shadow-shelf: 0 24px 60px rgb(7 31 23 / 0.18);
+  --shadow-tile: 0 10px 30px rgb(23 77 56 / 0.07);
+
+  --breakpoint-nook: 1240px;
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -65,7 +103,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: #174d38;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -79,7 +117,7 @@
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: #174d38;
 }
 
 .dark {
@@ -100,7 +138,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: #d5b477;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -113,7 +151,7 @@
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: #d5b477;
 }
 
 @layer base {
@@ -121,9 +159,65 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    text-rendering: optimizeLegibility;
   }
   html {
-    @apply font-sans;
+    @apply font-sans scroll-smooth;
   }
+
+  ::selection {
+    background-color: #c5ef70;
+    color: #071f17;
+  }
+  .dark ::selection {
+    background-color: #d5b477;
+    color: #071f17;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f4f4f0;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background: rgb(23 77 56 / 0.45);
+    border: 2px solid #f4f4f0;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #174d38;
+  }
+  .dark ::-webkit-scrollbar-track {
+    background: #0e241c;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgb(213 180 119 / 0.35);
+    border-color: #0e241c;
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #d5b477;
+  }
+}
+
+/* Shared Swiper theming (nook-shelf carousels) */
+.nook-swiper .swiper-pagination {
+  bottom: 24px !important;
+}
+
+.nook-swiper .swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background: white;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.nook-swiper .swiper-pagination-bullet-active {
+  width: 28px;
+  border-radius: 20px;
+  background: #c5ef70;
+  opacity: 1;
 }
