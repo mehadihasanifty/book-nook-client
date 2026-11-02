@@ -116,7 +116,7 @@ const AllBooksPage = () => {
           <div className="relative overflow-hidden px-6 pb-8 pt-12 sm:px-10 lg:px-14">
             <span
               aria-hidden
-              className="pointer-events-none absolute -top-8 right-6 select-none font-serif text-[150px] font-bold leading-none text-[#174D38]/[0.06] dark:text-white/[0.04]"
+              className="pointer-events-none absolute -top-8 right-6 select-none font-serif text-[150px] font-bold leading-none text-[#174D38]/6 dark:text-white/[0.04]"
             >
               ✦
             </span>

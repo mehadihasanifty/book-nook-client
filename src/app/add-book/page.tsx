@@ -84,7 +84,7 @@ export default function AddBookPage() {
         {/* Split layout: narrative panel + index card form */}
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[0.85fr_1.5fr]">
           {/* Left: reading room panel */}
-          <aside className="relative flex flex-col justify-between gap-8 overflow-hidden rounded-[2rem] bg-gradient-to-b from-[#0E4630] to-[#071F17] p-8 text-[#F5EFE3] shadow-[0_20px_50px_rgba(7,31,23,0.25)]">
+          <aside className="relative flex flex-col justify-between gap-8 overflow-hidden rounded-[2rem] bg-linear-to-b from-[#0E4630] to-[#071F17] p-8 text-[#F5EFE3] shadow-[0_20px_50px_rgba(7,31,23,0.25)]">
             <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full border border-[#D5B477]/20" />
             <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full border border-[#D5B477]/20" />
 
@@ -252,7 +252,7 @@ export default function AddBookPage() {
             </div>
 
             {/* Attached reader details */}
-            <div className="mt-8 rounded-2xl border border-[#174D38]/10 bg-[#174D38]/[0.04] p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+            <div className="mt-8 rounded-2xl border border-[#174D38]/10 bg-[#174D38]/4 p-5 dark:border-gray-800 dark:bg-white/3">
               <p className="mb-4 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[1.6px] text-[#A18A62]">
                 <BookUser size={13} />
                 Added by

@@ -49,7 +49,7 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full  px-3 py-3  sm:px-5">
-      <nav className="mx-auto flex w-full max-w-360 items-center justify-between gap-4 rounded-[1.75rem] border border-[#ECEAE2] bg-white px-4 py-2.5 shadow-[0_12px_35px_rgba(23,77,56,0.10)] dark:border-gray-800 dark:bg-gray-950 sm:rounded-full sm:px-6 sm:py-3">
+      <nav className="mx-auto flex w-full max-w-360 items-center justify-between gap-4 rounded-[1.75rem] border border-[#ECEAE2] bg-white px-4 py-2.5 shadow-[0_12px_35px_rgba(23,77,56,0.10)] dark:border-gray-800 dark:bg-gray-600 sm:rounded-full sm:px-6 sm:py-3">
         {/* Logo */}
         <Link
           href="/"
@@ -69,7 +69,7 @@ const Navbar = () => {
             <h1 className="font-serif text-[24px] font-bold tracking-tight text-[#1D241D] sm:text-[29px] dark:text-[#F5EFE3]">
               BookNook
             </h1>
-            <p className="mt-0.5 text-[10px] font-medium uppercase tracking-[2px] text-gray-500 dark:text-gray-400">
+            <p className="mt-0.5 text-[10px] font-medium uppercase tracking-[2px] text-black dark:text-gray-950">
               Your Reading Space
             </p>
           </div>

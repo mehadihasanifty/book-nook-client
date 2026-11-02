@@ -28,7 +28,7 @@ const slides = [
     title: "Every Book Opens a New World",
     description:
       "Travel through different stories, discover new perspectives, and let your imagination grow.",
-    image: "/slider-img2.jpg",
+    image: "/slider-img2..jpg",
     highlight: "New World",
   },
   {
@@ -53,7 +53,7 @@ const HeroBanner = () => {
   return (
     <section className="w-full bg-[#94ec8d] px-3 py-3 dark:bg-[#071F17] sm:px-5 sm:py-4">
       {!isMounted ? (
-        <div className="min-h-[500px] w-full rounded-[2.5rem] bg-[#F8F6F0] dark:bg-[#0E241C] sm:min-h-[600px]" />
+        <div className="min-h-125 w-full rounded-[2.5rem] bg-[#F8F6F0] dark:bg-[#0E241C] sm:min-h-150" />
       ) : (
         <Swiper
           modules={[Navigation, Autoplay]}
@@ -74,7 +74,7 @@ const HeroBanner = () => {
         >
           {slides.map((slide, ind) => (
             <SwiperSlide key={ind}>
-              <div className="grid min-h-[500px] grid-cols-1 overflow-hidden rounded-[2.5rem] bg-[#F8F6F0] shadow-[0_24px_60px_rgba(7,31,23,0.18)] dark:bg-[#0E241C] sm:min-h-[600px] lg:grid-cols-[1.05fr_1fr]">
+              <div className="grid min-h-125 grid-cols-1 overflow-hidden rounded-[2.5rem] bg-[#F8F6F0] shadow-[0_24px_60px_rgba(7,31,23,0.18)] dark:bg-[#0E241C] sm:min-h-150 lg:grid-cols-[1.05fr_1fr]">
                 {/* Left: content panel */}
                 <div className="relative flex flex-col justify-center gap-6 px-7 py-12 sm:px-12 sm:py-14 lg:px-14">
                   <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[#174D38]/20 bg-[#174D38]/5 px-4 py-2 text-[12px] font-semibold tracking-wide text-[#174D38] dark:border-[#D5B477]/25 dark:bg-transparent dark:text-[#D5B477]">

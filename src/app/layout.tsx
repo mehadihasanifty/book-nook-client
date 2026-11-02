@@ -28,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${spaceGrotesk.className}  h-full antialiased`}>
       {/*${geistSans.variable} ${geistMono.variable} */}
-      <body className="min-h-screen flex flex-col bg-[#FAF9F6]">
+      <body className="min-h-screen flex flex-col dark:bg-[#071F17]">
         <Toast.Provider placement="top end" />
         <Navbar />
         <main>{children}</main>
