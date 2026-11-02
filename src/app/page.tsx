@@ -1,6 +1,6 @@
 import HeroBanner from "./component/HeroBanner";
 import HowItWorks from "./component/HowItWorks";
-// import ReaderReviews from "./components/ReaderReviews";
+import ReaderReviews from "./component/ReaderReviews";
 // import TopCategories from "./components/TopCategories";
 
 export default function Home() {
@@ -9,7 +9,7 @@ export default function Home() {
       <HeroBanner />
       <HowItWorks />
       {/* <TopCategories /> */}
-      {/* <ReaderReviews /> */}
+      <ReaderReviews />
     </div>
   );
 }
