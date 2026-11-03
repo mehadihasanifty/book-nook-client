@@ -1,445 +1,353 @@
 "use client";
 
-import {
-  Button,
-  Description,
-  FieldError,
-  FieldGroup,
-  Fieldset,
-  Form,
-  Input,
-  InputGroup,
-  Label,
-  TextField,
-  toast,
-} from "@heroui/react";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
+import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
-import { ArrowLeft, BookPlus, BookOpen, UserRound } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
-export default function RegisterPage() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isVisibleCon, setIsVisibleCon] = useState(false);
+const RegisterPage = () => {
+  const router = useRouter();
 
-  const handleOnSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [image, setImage] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGooglePending, setIsGooglePending] = useState(false);
+
+  // Password validation
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasMinimumLength = password.length >= 6;
+
+  const isPasswordValid =
+    hasUppercase && hasLowercase && hasMinimumLength;
+
+  // Handle Registration
+  const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const user = Object.fromEntries(formData.entries()) as {
-      name: string;
-      image: string;
-      email: string;
-      password: string;
-      confirmPassword: string;
-    };
-    // console.log(user);
 
-    if (!user.name || !user.email || !user.password || !user.confirmPassword) {
-      toast.warning("Please fill up all the information");
-      return;
-    }
+    setErrorMessage("");
 
-    if (user.password.length < 8) {
-      toast.warning("Password must be 8 character");
-      return;
-    }
-
-    if (user.password !== user.confirmPassword) {
-      toast.warning("The password are not match");
-      return;
-    }
-
-    const { data, error } = await authClient.signUp.email({
-      name: user.name,
-      email: user.email,
-      password: user.password,
-      image: user.image,
-      callbackURL: "/",
-    });
-
-    if (data) {
-      // console.log(data);
-      redirect("/");
-    }
-    if (error) {
-      toast.warning(
-        error.message || "Something is wrong, Please check your information",
+    if (!isPasswordValid) {
+      setErrorMessage(
+        "Password must contain an uppercase letter, a lowercase letter, and at least 6 characters.",
       );
+      return;
     }
 
-    toast.success(
-      "You'r account created successfully. please Sign in for continue",
-    );
-    // alert("Form submitted successfully!");
-    form.reset();
-  };
-  const handleGoogleRegister = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/",
-    });
+    if (password !== confirmPassword) {
+      setErrorMessage("Passwords do not match.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const { error } = await authClient.signUp.email({
+        name,
+        email,
+        password,
+        ...(image.trim() && { image: image.trim() }),
+      });
+
+      if (error) {
+        setErrorMessage(error.message || "Registration failed. Please try again.");
+        return;
+      }
+
+      router.push("/login");
+    } catch (error) {
+      console.error("Registration failed:", error);
+      setErrorMessage("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const joiningSteps = [
-    {
-      number: "01",
-      icon: BookOpen,
-      title: "Fill in the card",
-      text: "A name, an email and a password — that is the whole form.",
-    },
-    {
-      number: "02",
-      icon: UserRound,
-      title: "Sign in",
-      text: "Use the same details to enter your reading nook.",
-    },
-    {
-      number: "03",
-      icon: BookPlus,
-      title: "Start borrowing",
-      text: "The whole shelf opens up, free and forever.",
-    },
-  ];
+  // Handle Google Login
+  const handleGoogleLogin = async () => {
+    setErrorMessage("");
+
+    try {
+      setIsGooglePending(true);
+
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+
+      if (error) {
+        setErrorMessage(error.message || "Google authentication failed.");
+        setIsGooglePending(false);
+      }
+    } catch (error) {
+      console.error("Google login failed:", error);
+      setErrorMessage("Unable to sign in with Google. Please try again.");
+      setIsGooglePending(false);
+    }
+  };
 
   return (
-    <section className="grid min-h-screen w-full grid-cols-1 bg-[#94ec8d] dark:bg-[#071F17] lg:grid-cols-[1.15fr_0.85fr]">
-      {/* Left: registration form */}
-      <section className="flex flex-col items-center justify-center px-4 py-10 sm:px-8">
-        <Link
-          href="/"
-          className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#174D38]/20 bg-white/60 px-4 py-2 text-[12px] font-semibold text-[#174D38] transition hover:bg-white dark:border-[#D5B477]/25 dark:bg-transparent dark:text-[#D5B477] dark:hover:bg-white/10"
-        >
-          <ArrowLeft size={15} /> Back to Home
-        </Link>
+    <main className="flex min-h-screen items-center justify-center  bg-[#94ec8d] px-4 py-10 dark:bg-[#071F17] sm:px-6">
+      <div className="w-full max-w-md">
+        {/* Registration Card */}
+        <div className="rounded-2xl border border-[#EAE5D9] bg-white p-6 shadow-[0_15px_50px_rgba(23,77,56,0.07)] dark:border-gray-800 dark:bg-gray-900 sm:p-8">
 
-        <div className="w-full max-w-xl rounded-[2rem] border border-[#ECEAE2] bg-[#FFFEFA] px-6 py-8 shadow-[0_18px_45px_rgba(23,77,56,0.12)] dark:border-gray-800 dark:bg-[#0E241C] sm:px-9">
+          {/* Header */}
           <div className="mb-7 text-center">
-            <span className="mb-3 inline-flex items-center gap-2.5 rounded-full border border-[#174D38]/20 bg-[#174D38]/5 px-4 py-2 text-[11px] font-bold uppercase tracking-[1.6px] text-[#174D38] dark:border-[#D5B477]/25 dark:bg-transparent dark:text-[#D5B477]">
-              Become a member
-            </span>
+            <Link href="/" className="inline-block">
+              <h1 className="font-serif text-3xl font-bold tracking-tight text-[#174D38] dark:text-[#D5B477]">
+                BookNook
+              </h1>
+            </Link>
 
-            <h1 className="font-serif text-3xl font-bold tracking-tight text-[#1D241D] sm:text-4xl dark:text-[#F5EFE3]">
-              Create an{" "}
-              <span className="relative inline-block">
-                <span className="relative z-10">Account</span>
-                <span className="absolute inset-x-0 bottom-1 h-3.5 rounded-full bg-[#F3B54A]/50" />
-              </span>
-            </h1>
+            <div className="mx-auto my-3 h-1 w-12 rounded-full bg-[#C49A5A]" />
 
-            <p className="mx-auto mt-2 max-w-md text-[13px] leading-6 text-[#6B6F63] dark:text-gray-400">
-              Join BookNook and discover your next favorite book. Free to join,
-              and it takes a minute. You need an email address and a password of
-              your own — nothing else, and no card.
+            <h2 className="font-serif text-2xl font-bold text-gray-900 dark:text-white">
+              Create Your Account
+            </h2>
+
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              Join BookNook and discover your next favorite book.
             </p>
           </div>
 
+          {/* Error Message */}
+          {errorMessage && (
+            <div
+              role="alert"
+              aria-live="polite"
+              className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900 dark:bg-red-950/40 dark:text-red-400"
+            >
+              {errorMessage}
+            </div>
+          )}
+
           {/* Registration Form */}
-          <Form className="w-full" onSubmit={handleOnSubmit}>
-            <Fieldset className="w-full">
-              <Fieldset.Legend className="sr-only">
-                Registration Form
-              </Fieldset.Legend>
+          <form onSubmit={handleRegister} className="space-y-4">
 
-              <Description className="sr-only text-black">
-                Enter your details to create a BookNook account.
-              </Description>
+            {/* Name */}
+            <div>
+              <label
+                htmlFor="name"
+                className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-200"
+              >
+                Full Name
+              </label>
 
-              <FieldGroup className="gap-5">
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <TextField
-                    isRequired
-                    name="name"
-                    type="text"
-                    validate={(value) => {
-                      if (value.length < 3) {
-                        return "Name must be at least 3 characters";
-                      }
-                      return null;
-                    }}
-                  >
-                    <Label className="mb-2 text-[11px] font-bold uppercase tracking-[1.4px] text-[#A18A62]">
-                      Full Name
-                    </Label>
-                    <Input
-                      placeholder="John Doe"
-                      className="rounded-full border-gray-300 bg-white placeholder:font-serif placeholder:italic placeholder:text-gray-400 dark:bg-gray-900"
-                    />
-                    <FieldError />
-                  </TextField>
+              <input
+                id="name"
+                type="text"
+                placeholder="Enter your full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                autoComplete="name"
+                className="w-full rounded-lg border border-gray-200 bg-[#FFFEFA] px-4 py-3 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-[#174D38] focus:ring-2 focus:ring-[#174D38]/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-[#D5B477]"
+              />
+            </div>
 
-                  <TextField isRequired name="image" type="url">
-                    <Label className="mb-2 text-[11px] font-bold uppercase tracking-[1.4px] text-[#A18A62]">
-                      Profile Image URL
-                    </Label>
-                    <Input
-                      className="rounded-full border-gray-300 bg-white placeholder:font-serif placeholder:italic placeholder:text-gray-400 dark:bg-gray-900"
-                      placeholder="https://example.com/photo.jpg"
-                    />
-                    <FieldError />
-                  </TextField>
-                </div>
+            {/* Email */}
+            <div>
+              <label
+                htmlFor="email"
+                className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-200"
+              >
+                Email Address
+              </label>
 
-                <TextField isRequired name="email" type="email">
-                  <Label className="mb-2 text-[11px] font-bold uppercase tracking-[1.4px] text-[#A18A62]">
-                    Email Address
-                  </Label>
-                  <Input
-                    placeholder="john@example.com"
-                    className="rounded-full border-gray-300 bg-white placeholder:font-serif placeholder:italic placeholder:text-gray-400 dark:bg-gray-900"
-                  />
-                  <FieldError />
-                </TextField>
+              <input
+                id="email"
+                type="email"
+                placeholder="example@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                className="w-full rounded-lg border border-gray-200 bg-[#FFFEFA] px-4 py-3 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-[#174D38] focus:ring-2 focus:ring-[#174D38]/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-[#D5B477]"
+              />
+            </div>
 
-                <TextField
-                  isRequired
-                  minLength={8}
-                  name="password"
-                  type="password"
-                  validate={(value) => {
-                    if (value.length < 8) {
-                      return "Password must be at least 8 characters";
-                    }
-                    if (!/[A-Z]/.test(value)) {
-                      return "Password must contain at least one uppercase letter";
-                    }
-                    if (!/[0-9]/.test(value)) {
-                      return "Password must contain at least one number";
-                    }
-                    return null;
-                  }}
-                >
-                  <Label className="mb-2 text-[11px] font-bold uppercase tracking-[1.4px] text-[#A18A62]">
-                    Password
-                  </Label>
-                  <InputGroup className="rounded-full border-gray-300">
-                    <InputGroup.Input
-                      aria-label="Password"
-                      className="w-full rounded-full bg-white text-black placeholder:font-serif placeholder:italic placeholder:text-gray-400 dark:bg-gray-900"
-                      type={isVisible ? "text" : "password"}
-                      placeholder="Enter your password"
-                    />
+            {/* Photo URL */}
+            <div>
+              <label
+                htmlFor="image"
+                className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-200"
+              >
+                Profile Photo URL
+                <span className="ml-1 font-normal text-gray-400">
+                  (Optional)
+                </span>
+              </label>
 
-                    <InputGroup.Suffix className="pe-1">
-                      <Button
-                        isIconOnly
-                        aria-label={
-                          isVisible ? "Hide password" : "Show password"
-                        }
-                        size="sm"
-                        variant="ghost"
-                        onPress={() => setIsVisible(!isVisible)}
-                      >
-                        {isVisible ? (
-                          <FaEye className="size-4 text-gray-500" />
-                        ) : (
-                          <FaEyeSlash className="size-4 text-gray-500" />
-                        )}
-                      </Button>
-                    </InputGroup.Suffix>
-                  </InputGroup>
-                  <FieldError />
-                  <Description className="mt-1 font-serif text-xs italic text-[#A18A62]">
-                    Must be at least 8 characters with 1 uppercase and 1 number
-                  </Description>
-                </TextField>
+              <input
+                id="image"
+                type="url"
+                placeholder="https://example.com/photo.jpg"
+                value={image}
+                onChange={(e) => setImage(e.target.value)}
+                autoComplete="url"
+                className="w-full rounded-lg border border-gray-200 bg-[#FFFEFA] px-4 py-3 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-[#174D38] focus:ring-2 focus:ring-[#174D38]/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-[#D5B477]"
+              />
+            </div>
 
-                <TextField
-                  isRequired
-                  minLength={8}
-                  name="confirmPassword"
-                  type="password"
-                  validate={(value) => {
-                    if (value.length < 8) {
-                      return "Password must be at least 8 characters";
-                    }
-                    if (!/[A-Z]/.test(value)) {
-                      return "Password must contain at least one uppercase letter";
-                    }
-                    if (!/[0-9]/.test(value)) {
-                      return "Password must contain at least one number";
-                    }
-                    return null;
-                  }}
-                >
-                  <Label className="mb-2 text-[11px] font-bold uppercase tracking-[1.4px] text-[#A18A62]">
-                    Confirm Password
-                  </Label>
-                  <InputGroup className="rounded-full border-gray-300">
-                    <InputGroup.Input
-                      aria-label="Password"
-                      className="w-full rounded-full bg-white placeholder:font-serif placeholder:italic placeholder:text-gray-400 dark:bg-gray-900"
-                      type={isVisibleCon ? "text" : "password"}
-                      placeholder="Confirm your password"
-                    />
-                    <InputGroup.Suffix className="pe-1">
-                      <Button
-                        isIconOnly
-                        aria-label={
-                          isVisibleCon ? "Hide password" : "Show password"
-                        }
-                        size="sm"
-                        variant="ghost"
-                        onPress={() => setIsVisibleCon(!isVisibleCon)}
-                      >
-                        {isVisibleCon ? (
-                          <FaEye className="size-4 text-gray-500" />
-                        ) : (
-                          <FaEyeSlash className="size-4 text-gray-500" />
-                        )}
-                      </Button>
-                    </InputGroup.Suffix>
-                  </InputGroup>
-                  <FieldError />
-                  <Description className="mt-1 font-serif text-xs italic text-[#A18A62]">
-                    Must be at least 8 characters with 1 uppercase and 1 number
-                  </Description>
-                </TextField>
-              </FieldGroup>
+            {/* Password */}
+            <div>
+  <label
+    htmlFor="password"
+    className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-200"
+  >
+    Password
+  </label>
 
-              {/* Register Button */}
-              <Fieldset.Actions className=" w-full">
-                <Button
-                  type="submit"
-                  className="w-full cursor-pointer rounded-full bg-[#174D38] py-3 font-semibold text-[#F5EFE3] shadow-md shadow-[#174D38]/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#103B2B] hover:shadow-lg dark:bg-[#D5B477] dark:text-[#173D2D] dark:hover:bg-[#E5C88F]"
-                >
-                  Register
-                </Button>
-              </Fieldset.Actions>
-            </Fieldset>
-          </Form>
+  <div className="relative">
+    <input
+      id="password"
+      type={showPassword ? "text" : "password"}
+      placeholder="Create a strong password"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      required
+      autoComplete="new-password"
+      className="w-full rounded-lg border border-gray-200 bg-[#FFFEFA] px-4 py-3 pr-12 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-[#174D38] focus:ring-2 focus:ring-[#174D38]/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-[#D5B477]"
+    />
+
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      aria-label={showPassword ? "Hide password" : "Show password"}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-[#174D38] dark:hover:text-[#D5B477]"
+    >
+      {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
+    </button>
+  </div>
+
+  {/* Password Requirements */}
+</div>
+           <div>
+  <label
+    htmlFor="confirmPassword"
+    className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-200"
+  >
+    Confirm Password
+  </label>
+
+  <div className="relative">
+    <input
+      id="confirmPassword"
+      type={showConfirmPassword ? "text" : "password"}
+      placeholder="Confirm your password"
+      value={confirmPassword}
+      onChange={(e) => setConfirmPassword(e.target.value)}
+      required
+      autoComplete="new-password"
+      className="w-full rounded-lg border border-gray-200 bg-[#FFFEFA] px-4 py-3 pr-12 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-[#174D38] focus:ring-2 focus:ring-[#174D38]/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-[#D5B477]"
+    />
+
+    <button
+      type="button"
+      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+      aria-label={
+        showConfirmPassword ? "Hide confirm password" : "Show confirm password"
+      }
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-[#174D38] dark:hover:text-[#D5B477]"
+    >
+      {showConfirmPassword ? <EyeOff size={19} /> : <Eye size={19} />}
+    </button>
+  </div>
+
+  {confirmPassword && password !== confirmPassword && (
+    <p className="mt-1.5 text-xs text-red-500">
+      Passwords do not match.
+    </p>
+  )}
+</div>
+
+            {/* Register Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting || isGooglePending}
+              className="mt-2 w-full rounded-lg bg-[#174D38] px-4 py-3 text-sm font-semibold tracking-wide text-white shadow-md shadow-[#174D38]/15 transition-all duration-300 hover:bg-[#103B2B] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-[#D5B477] dark:text-[#173D2D] dark:hover:bg-[#E5C88F]"
+            >
+              {isSubmitting ? "Creating Account..." : "Create Account"}
+            </button>
+          </form>
 
           {/* Divider */}
-          <div className="my-7 flex items-center gap-4">
-            <div className="h-px flex-1 border-t border-dashed border-[#C49A5A]/50" />
-            <span className="text-[10px] font-bold uppercase tracking-[1.8px] text-[#A18A62]">
+          <div className="my-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+            <span className="text-xs font-medium uppercase tracking-wider text-gray-400">
               Or continue with
             </span>
-            <div className="h-px flex-1 border-t border-dashed border-[#C49A5A]/50" />
+            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
           </div>
 
-          {/* Google Registration */}
-          <Button
-            onClick={handleGoogleRegister}
+          {/* Google Login */}
+          <button
             type="button"
-            variant="outline"
-            className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-full border border-[#DCD5CB] bg-white py-2.5 font-semibold text-[#26372F] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#FAF7F2] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+            onClick={handleGoogleLogin}
+            disabled={isGooglePending || isSubmitting}
+            className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 transition-all duration-300 hover:border-[#C49A5A] hover:bg-[#F8F6F0] disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
           >
-            <FcGoogle className="size-5" />
-            Continue with Google
-          </Button>
+            {isGooglePending ? (
+              "Connecting to Google..."
+            ) : (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 48 48"
+                  className="h-5 w-5"
+                >
+                  <path
+                    fill="#EA4335"
+                    d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"
+                  />
+                  <path
+                    fill="#4285F4"
+                    d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 37.93 46.98 31.78 46.98 24.55Z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.88.93 7.55 2.56 10.78l7.97-6.19Z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.14 1.45-4.88 2.3-8.18 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"
+                  />
+                </svg>
+
+                Continue with Google
+              </>
+            )}
+          </button>
 
           {/* Login Link */}
-          <p className="mt-7 text-center text-sm text-[#6B6F63] dark:text-gray-400">
+          <p className="mt-7 text-center text-sm text-gray-500 dark:text-gray-400">
             Already have an account?{" "}
             <Link
               href="/login"
-              className="font-semibold text-[#174D38] underline decoration-[#F3B54A]/70 decoration-2 underline-offset-4 transition-colors hover:text-[#103B2B] dark:text-[#D5B477] dark:hover:text-[#E5C88F]"
+              className="font-semibold text-[#174D38] transition-colors hover:text-[#C49A5A] dark:text-[#D5B477]"
             >
               Login
             </Link>
           </p>
         </div>
-      </section>
 
-      {/* Right: member card preview panel */}
-      <aside className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-b from-[#0E4630] to-[#071F17] p-10 text-[#F5EFE3] lg:flex">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full border border-[#D5B477]/20" />
-        <div className="pointer-events-none absolute -bottom-28 -left-20 h-72 w-72 rounded-full bg-[#F3B54A]/10 blur-3xl" />
-
-        <div>
-          <span className="inline-flex items-center gap-2.5 rounded-full border border-[#D5B477]/30 bg-white/5 px-4 py-2 text-[12px] font-semibold uppercase tracking-wider text-[#E7C995]">
-            <span className="h-2 w-2 rounded-full bg-[#C5EF70]" />
-            Get a card of your own
-          </span>
-
-          <h2 className="mt-7 max-w-sm font-serif text-4xl font-bold leading-tight text-[#F5EFE3]">
-            Your card, stamped in{" "}
-            <span className="relative inline-block">
-              <span className="relative z-10">seconds</span>
-              <span className="absolute inset-x-0 bottom-1 h-3.5 rounded-full bg-[#F3B54A]/50" />
-            </span>
-          </h2>
-
-          <p className="mt-4 max-w-xs text-sm leading-7 text-[#F5EFE3]/60">
-            Fill the form and your member card is ready — no fees, no queues.
-          </p>
-        </div>
-
-        {/* Card preview */}
-        <div className="relative overflow-hidden rounded-[1.6rem] border border-[#D5B477]/40 bg-gradient-to-br from-[#174D38] to-[#071F17] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.35)]">
-          <div className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full border border-[#D5B477]/25" />
-
-          <span className="absolute right-5 top-0 hidden h-12 w-5 rounded-b-md bg-[#C5EF70] shadow-md lg:block" />
-
-          <div className="relative flex items-center gap-4">
-            <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-white/10 ring-2 ring-[#D5B477]/60 ring-offset-4 ring-offset-[#071F17]">
-              <UserRound size={26} className="text-[#E7C995]" />
-            </span>
-
-            <div className="min-w-0">
-              <span className="text-[10px] font-bold uppercase tracking-[2.2px] text-[#E7C995]/90">
-                BookNook Member Card
-              </span>
-
-              <p className="mt-1 truncate font-serif text-xl font-bold text-[#F5EFE3]">
-                Your Name Here
-              </p>
-
-              <p className="truncate text-xs text-[#F5EFE3]/60">
-                you@example.com
-              </p>
-
-              <span className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[9px] font-semibold uppercase tracking-[1.6px] text-[#C5EF70]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#C5EF70]" />
-                Reader In Good Standing
-              </span>
-            </div>
-          </div>
-
-          <div className="relative mt-5 flex items-center justify-between border-t border-dashed border-[#F5EFE3]/20 pt-3.5">
-            <span className="font-serif text-xs tracking-[3px] text-[#E7C995]/70">
-              THE READING CORNER
-            </span>
-
-            <span className="flex gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-[#C5EF70]/80" />
-              <span className="h-2 w-2 rounded-full bg-[#D5B477]/80" />
-              <span className="h-2 w-2 rounded-full bg-white/40" />
-            </span>
-          </div>
-        </div>
-
-        {/* Joining steps */}
-        <div className="flex flex-col gap-3">
-          {joiningSteps.map((step) => (
-            <div
-              key={step.number}
-              className="flex items-center gap-3.5 rounded-2xl border border-[#F5EFE3]/10 bg-white/[0.04] px-4 py-3.5"
-            >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#C5EF70]/15 font-serif text-sm font-bold text-[#C5EF70]">
-                {step.number}
-              </span>
-
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-[#F5EFE3]/90">
-                  {step.title}
-                </p>
-                <p className="truncate text-xs text-[#F5EFE3]/55">
-                  {step.text}
-                </p>
-              </div>
-            </div>
-          ))}
-
-          <p className="mt-2 text-center font-serif text-xs italic text-[#E7C995]/70">
-            “Every book opens a new world.”
-          </p>
-        </div>
-      </aside>
-    </section>
+        {/* Footer */}
+        <p className="mt-6 text-center font-serif text-xs italic text-[#A18A62]">
+          Every book opens a new world.
+        </p>
+      </div>
+    </main>
   );
-}
+};
+
+export default RegisterPage;
+
