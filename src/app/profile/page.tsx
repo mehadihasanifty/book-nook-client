@@ -46,7 +46,7 @@ export default function ProfilePage() {
         </p>
 
         {/* Member card */}
-        <section className="relative mt-8 w-full overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0E4630] via-[#174D38] to-[#071F17] p-7 text-[#F5EFE3] shadow-[0_24px_60px_rgba(7,31,23,0.35)] sm:p-8">
+        <section className="relative mt-8 w-full overflow-hidden rounded-[2rem] bg-linear-to-br from-[#0E4630] via-[#174D38] to-[#071F17] p-7 text-[#F5EFE3] shadow-[0_24px_60px_rgba(7,31,23,0.35)] sm:p-8">
           <div className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full border border-[#D5B477]/25" />
           <div className="pointer-events-none absolute -right-4 -top-6 h-20 w-20 rounded-full border border-[#D5B477]/25" />
           <div className="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-[#F3B54A]/10 blur-2xl" />
@@ -115,7 +115,7 @@ export default function ProfilePage() {
             {detailRows.map((row) => (
               <li
                 key={row.label}
-                className="flex items-center gap-4 rounded-2xl border border-[#174D38]/10 bg-[#174D38]/[0.04] px-4 py-3.5 dark:border-gray-800 dark:bg-white/[0.03]"
+                className="flex items-center gap-4 rounded-2xl border border-[#174D38]/10 bg-[#174D38]/4 px-4 py-3.5 dark:border-gray-800 dark:bg-white/3"
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#174D38] text-[#E7C995] dark:bg-[#D5B477] dark:text-[#173D2D]">
                   <row.icon size={17} />

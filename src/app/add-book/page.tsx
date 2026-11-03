@@ -205,16 +205,16 @@ export default function AddBookPage() {
                     name="category"
                     defaultValue=""
                     required
-                    className="w-full appearance-none border-b-2 border-[#174D38]/15 bg-transparent pb-2.5 pr-6 text-sm text-[#3D4038] outline-none transition-colors focus:border-[#174D38] dark:border-gray-700 dark:text-gray-300 dark:focus:border-[#D5B477]"
+                    className="w-full appearance-none border-b-2 border-[#174D38]/15 bg-[#FFFEFA] pb-2.5 pr-6 text-sm text-[#1D241D] outline-none transition-colors focus:border-[#174D38] dark:border-gray-700 dark:bg-[#0E241C] dark:text-[#F5EFE3] dark:focus:border-[#D5B477]"
                   >
-                  <option value="" disabled>
+                  <option value="" disabled className="bg-[#F4F4F0] text-[#6B6F63]">
                       Select a category
                     </option>
-                    <option>Fiction</option>
-                    <option>Science</option>
-                    <option>History</option>
-                    <option>Kids</option>
-                    <option>Others</option>
+                    <option className="bg-[#FFFEFA] text-[#1D241D]">Fiction</option>
+                    <option className="bg-[#FFFEFA] text-[#1D241D]">Science</option>
+                    <option className="bg-[#FFFEFA] text-[#1D241D]">History</option>
+                    <option className="bg-[#FFFEFA] text-[#1D241D]">Kids</option>
+                    <option className="bg-[#FFFEFA] text-[#1D241D]">Others</option>
                   </select>
 
                   <ChevronDown

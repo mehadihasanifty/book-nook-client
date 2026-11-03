@@ -3,8 +3,6 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
-export const runtime = "nodejs";
-
 const encode = (value: unknown) => Buffer.from(JSON.stringify(value)).toString("base64url");
 
 export async function GET() {

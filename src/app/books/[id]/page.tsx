@@ -77,23 +77,46 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
               <p className="mt-3 flex items-center gap-2 text-sm text-[#6B6F63] dark:text-gray-400"><UserRound size={16} /> {book.author}</p>
               <p className="mt-7 whitespace-pre-wrap text-sm leading-7 text-[#55584E] dark:text-gray-300">{book.description}</p>
               <div className="mt-7 grid gap-3 rounded-2xl border border-[#174D38]/10 bg-[#174D38]/5 p-5 text-sm dark:border-gray-800 dark:bg-white/[0.03]">
-                <p><span className="font-semibold text-[#174D38] dark:text-[#D5B477]">Added by</span> {book.userName} · {book.userEmail}</p>
-                <p className="flex items-center gap-2 text-[#6B6F63] dark:text-gray-400"><CalendarDays size={15} /> Added {book.addedDate ? new Date(book.addedDate).toLocaleDateString() : "recently"}</p>
+                <p><span className="font-semibold text-[#174D38] dark:text-[#D5B477]">Added by
+                  </span> {book.userName} · {book.userEmail}
+                  </p>
+                <p className="flex items-center gap-2 text-[#6B6F63] dark:text-gray-400">
+                  <CalendarDays size={15} />
+                   Added {book.addedDate ? new Date(book.addedDate).toLocaleDateString() : "recently"}</p>
                 <p className="font-semibold text-[#174D38] dark:text-[#D5B477]">{book.totalCopies > 0 ? `${book.totalCopies} ${book.totalCopies === 1 ? "copy" : "copies"} available` : "Not Available"}</p>
               </div>
-              <button type="button" disabled={book.totalCopies < 1} onClick={() => setShowBorrow(true)} className="mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-[#174D38] px-5 py-3.5 text-sm font-semibold text-[#F5EFE3] shadow-md transition hover:bg-[#103B2B] disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#D5B477] dark:text-[#173D2D]"> <BookOpen size={17} /> {book.totalCopies < 1 ? "Not Available" : "Borrow This Book"}</button>
+              <button type="button" disabled={book.totalCopies < 1} onClick={() => setShowBorrow(true)} className="mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-[#174D38] px-5 py-3.5 text-sm font-semibold text-[#F5EFE3] shadow-md transition hover:bg-[#103B2B] disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#D5B477] dark:text-[#173D2D]"> <BookOpen size={17} /> {book.totalCopies < 1 ? "Not Available" : "Borrow This Book"}
+              </button>
             </div>
           </article>
         ) : (
-          <div className="rounded-[2.5rem] bg-[#FFFEFA] p-10 text-center dark:bg-[#0E241C]"><BookOpen className="mx-auto mb-4 text-[#A18A62]" /><p className="text-[#55584E] dark:text-gray-300">This book could not be found.</p></div>
+          <div className="rounded-[2.5rem] bg-[#FFFEFA] p-10 text-center dark:bg-[#0E241C]">
+            <BookOpen className="mx-auto mb-4 text-[#A18A62]" /><p className="text-[#55584E] dark:text-gray-300">This book could not be found.
+          </p>
+          </div>
         )}
       </div>
       {showBorrow && book && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setShowBorrow(false)}>
           <section role="dialog" aria-modal="true" aria-labelledby="borrow-title" className="w-full max-w-lg rounded-[2rem] border border-[#ECEAE2] bg-[#FFFEFA] p-6 shadow-2xl dark:border-gray-800 dark:bg-[#0E241C] sm:p-8">
-            <div className="flex items-start justify-between"><div><p className="text-[11px] font-bold uppercase tracking-widest text-[#A18A62]">Confirm loan</p><h2 id="borrow-title" className="mt-2 font-serif text-2xl font-bold text-[#1D241D] dark:text-[#F5EFE3]">Borrow {book.title}</h2></div><button type="button" aria-label="Close" onClick={() => setShowBorrow(false)} className="rounded-full p-2 text-[#6B6F63] hover:bg-[#174D38]/10"><X size={19} /></button></div>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-[#A18A62]">Confirm loan</p>
+                <h2 id="borrow-title" className="mt-2 font-serif text-2xl font-bold text-[#1D241D] dark:text-[#F5EFE3]">Borrow {book.title}</h2>
+                </div>
+                <button type="button" aria-label="Close" onClick={() => setShowBorrow(false)} className="rounded-full p-2 text-[#6B6F63] hover:bg-[#174D38]/10"><X size={19} />
+                </button>
+                </div>
             <p className="mt-3 text-sm leading-6 text-[#6B6F63] dark:text-gray-400">Your borrow is due in 14 days. The available copy count will be updated when you confirm.</p>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2"><label className="text-[11px] font-bold uppercase tracking-wider text-[#A18A62]">Your name<input readOnly value={user?.name || ""} className="mt-2 w-full rounded-lg border border-[#174D38]/10 bg-white px-3 py-2.5 text-sm text-[#1D241D] dark:border-gray-700 dark:bg-gray-900 dark:text-[#F5EFE3]" /></label><label className="text-[11px] font-bold uppercase tracking-wider text-[#A18A62]">Your email<input readOnly value={user?.email || ""} className="mt-2 w-full rounded-lg border border-[#174D38]/10 bg-white px-3 py-2.5 text-sm text-[#1D241D] dark:border-gray-700 dark:bg-gray-900 dark:text-[#F5EFE3]" /></label></div>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[#A18A62]">Your name
+                <input readOnly value={user?.name || ""} className="mt-2 w-full rounded-lg border border-[#174D38]/10 bg-white px-3 py-2.5 text-sm text-[#1D241D] dark:border-gray-700 dark:bg-gray-900 dark:text-[#F5EFE3]" />
+                </label>
+                <label className="text-[11px] font-bold uppercase tracking-wider text-[#A18A62]">
+                   Your email
+                  <input readOnly value={user?.email || ""} className="mt-2 w-full rounded-lg border border-[#174D38]/10 bg-white px-3 py-2.5 text-sm text-[#1D241D] dark:border-gray-700 dark:bg-gray-900 dark:text-[#F5EFE3]" />
+                </label>
+                </div>
             <button type="button" disabled={borrowing} onClick={borrow} className="mt-7 w-full rounded-full bg-[#174D38] px-5 py-3.5 text-sm font-semibold text-[#F5EFE3] transition hover:bg-[#103B2B] disabled:opacity-60 dark:bg-[#D5B477] dark:text-[#173D2D]">{borrowing ? "Confirming…" : "Confirm Borrow"}</button>
           </section>
         </div>
