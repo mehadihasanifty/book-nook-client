@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
 import { Eye, EyeOff } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -21,27 +22,51 @@ const RegisterPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGooglePending, setIsGooglePending] = useState(false);
 
-  // Password validation
+  // Password Validation
   const hasUppercase = /[A-Z]/.test(password);
   const hasLowercase = /[a-z]/.test(password);
-  const hasMinimumLength = password.length >= 6;
+  const hasNumber = /[0-9]/.test(password);
+  const hasMinimumLength = password.length >= 8;
 
   const isPasswordValid =
-    hasUppercase && hasLowercase && hasMinimumLength;
+    hasUppercase &&
+    hasLowercase &&
+    hasNumber &&
+    hasMinimumLength;
 
   // Handle Registration
   const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (isSubmitting || isGooglePending) return;
+
     setErrorMessage("");
 
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedImage = image.trim();
+
+    // Required Fields
+    if (!trimmedName || !trimmedEmail || !password || !confirmPassword) {
+      setErrorMessage("Please fill in all required fields.");
+      return;
+    }
+
+    // Name Validation
+    if (trimmedName.length < 3) {
+      setErrorMessage("Name must be at least 3 characters.");
+      return;
+    }
+
+    // Password Validation
     if (!isPasswordValid) {
       setErrorMessage(
-        "Password must contain an uppercase letter, a lowercase letter, and at least 6 characters.",
+        "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.",
       );
       return;
     }
 
+    // Confirm Password Validation
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match.");
       return;
@@ -50,29 +75,44 @@ const RegisterPage = () => {
     try {
       setIsSubmitting(true);
 
-      const { error } = await authClient.signUp.email({
-        name,
-        email,
+      const { data, error } = await authClient.signUp.email({
+        name: trimmedName,
+        email: trimmedEmail,
         password,
-        ...(image.trim() && { image: image.trim() }),
+        ...(trimmedImage ? { image: trimmedImage } : {}),
       });
 
       if (error) {
-        setErrorMessage(error.message || "Registration failed. Please try again.");
+        console.error("Registration Error:", error);
+
+        setErrorMessage(
+          error.message || "Registration failed. Please try again.",
+        );
         return;
       }
 
-      router.push("/login");
+      if (!data) {
+        setErrorMessage("Unable to create your account. Please try again.");
+        return;
+      }
+
+      router.replace("/login");
+      router.refresh();
+
     } catch (error) {
       console.error("Registration failed:", error);
+
       setErrorMessage("Something went wrong. Please try again.");
+
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Handle Google Login
-  const handleGoogleLogin = async () => {
+  // Handle Google Registration
+  const handleGoogleRegister = async () => {
+    if (isGooglePending || isSubmitting) return;
+
     setErrorMessage("");
 
     try {
@@ -84,19 +124,28 @@ const RegisterPage = () => {
       });
 
       if (error) {
-        setErrorMessage(error.message || "Google authentication failed.");
+        console.error("Google Registration Error:", error);
+
+        setErrorMessage(
+          error.message || "Google authentication failed. Please try again.",
+        );
+
         setIsGooglePending(false);
       }
+
     } catch (error) {
-      console.error("Google login failed:", error);
+      console.error("Google registration failed:", error);
+
       setErrorMessage("Unable to sign in with Google. Please try again.");
+
       setIsGooglePending(false);
     }
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center  bg-[#94ec8d] px-4 py-10 dark:bg-[#071F17] sm:px-6">
+    <main className="flex min-h-screen items-center justify-center bg-[#94ec8d] px-4 py-10 dark:bg-[#071F17] sm:px-6">
       <div className="w-full max-w-md">
+
         {/* Registration Card */}
         <div className="rounded-2xl border border-[#EAE5D9] bg-white p-6 shadow-[0_15px_50px_rgba(23,77,56,0.07)] dark:border-gray-800 dark:bg-gray-900 sm:p-8">
 
@@ -144,11 +193,13 @@ const RegisterPage = () => {
 
               <input
                 id="name"
+                name="name"
                 type="text"
                 placeholder="Enter your full name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                minLength={3}
                 autoComplete="name"
                 className="w-full rounded-lg border border-gray-200 bg-[#FFFEFA] px-4 py-3 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-[#174D38] focus:ring-2 focus:ring-[#174D38]/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-[#D5B477]"
               />
@@ -165,6 +216,7 @@ const RegisterPage = () => {
 
               <input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="example@email.com"
                 value={email}
@@ -189,6 +241,7 @@ const RegisterPage = () => {
 
               <input
                 id="image"
+                name="image"
                 type="url"
                 placeholder="https://example.com/photo.jpg"
                 value={image}
@@ -200,75 +253,116 @@ const RegisterPage = () => {
 
             {/* Password */}
             <div>
-  <label
-    htmlFor="password"
-    className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-200"
-  >
-    Password
-  </label>
+              <label
+                htmlFor="password"
+                className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-200"
+              >
+                Password
+              </label>
 
-  <div className="relative">
-    <input
-      id="password"
-      type={showPassword ? "text" : "password"}
-      placeholder="Create a strong password"
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-      required
-      autoComplete="new-password"
-      className="w-full rounded-lg border border-gray-200 bg-[#FFFEFA] px-4 py-3 pr-12 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-[#174D38] focus:ring-2 focus:ring-[#174D38]/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-[#D5B477]"
-    />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Create a strong password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  className="w-full rounded-lg border border-gray-200 bg-[#FFFEFA] px-4 py-3 pr-12 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-[#174D38] focus:ring-2 focus:ring-[#174D38]/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-[#D5B477]"
+                />
 
-    <button
-      type="button"
-      onClick={() => setShowPassword(!showPassword)}
-      aria-label={showPassword ? "Hide password" : "Show password"}
-      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-[#174D38] dark:hover:text-[#D5B477]"
-    >
-      {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
-    </button>
-  </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-[#174D38] dark:hover:text-[#D5B477]"
+                >
+                  {showPassword ? (
+                    <EyeOff size={19} />
+                  ) : (
+                    <Eye size={19} />
+                  )}
+                </button>
+              </div>
 
-  {/* Password Requirements */}
-</div>
-           <div>
-  <label
-    htmlFor="confirmPassword"
-    className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-200"
-  >
-    Confirm Password
-  </label>
+              {/* Password Requirements */}
+              <div className="mt-2 space-y-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className={hasMinimumLength ? "text-green-600" : ""}>
+                  {hasMinimumLength ? "✓" : "○"} At least 8 characters
+                </p>
 
-  <div className="relative">
-    <input
-      id="confirmPassword"
-      type={showConfirmPassword ? "text" : "password"}
-      placeholder="Confirm your password"
-      value={confirmPassword}
-      onChange={(e) => setConfirmPassword(e.target.value)}
-      required
-      autoComplete="new-password"
-      className="w-full rounded-lg border border-gray-200 bg-[#FFFEFA] px-4 py-3 pr-12 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-[#174D38] focus:ring-2 focus:ring-[#174D38]/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-[#D5B477]"
-    />
+                <p className={hasUppercase ? "text-green-600" : ""}>
+                  {hasUppercase ? "✓" : "○"} One uppercase letter
+                </p>
 
-    <button
-      type="button"
-      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-      aria-label={
-        showConfirmPassword ? "Hide confirm password" : "Show confirm password"
-      }
-      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-[#174D38] dark:hover:text-[#D5B477]"
-    >
-      {showConfirmPassword ? <EyeOff size={19} /> : <Eye size={19} />}
-    </button>
-  </div>
+                <p className={hasLowercase ? "text-green-600" : ""}>
+                  {hasLowercase ? "✓" : "○"} One lowercase letter
+                </p>
 
-  {confirmPassword && password !== confirmPassword && (
-    <p className="mt-1.5 text-xs text-red-500">
-      Passwords do not match.
-    </p>
-  )}
-</div>
+                <p className={hasNumber ? "text-green-600" : ""}>
+                  {hasNumber ? "✓" : "○"} One number
+                </p>
+              </div>
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label
+                htmlFor="confirmPassword"
+                className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-200"
+              >
+                Confirm Password
+              </label>
+
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  className="w-full rounded-lg border border-gray-200 bg-[#FFFEFA] px-4 py-3 pr-12 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-[#174D38] focus:ring-2 focus:ring-[#174D38]/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-[#D5B477]"
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
+                  aria-label={
+                    showConfirmPassword
+                      ? "Hide confirm password"
+                      : "Show confirm password"
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-[#174D38] dark:hover:text-[#D5B477]"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={19} />
+                  ) : (
+                    <Eye size={19} />
+                  )}
+                </button>
+              </div>
+
+              {confirmPassword && password !== confirmPassword && (
+                <p className="mt-1.5 text-xs text-red-500">
+                  Passwords do not match.
+                </p>
+              )}
+
+              {confirmPassword && password === confirmPassword && (
+                <p className="mt-1.5 text-xs text-green-600">
+                  Passwords match.
+                </p>
+              )}
+            </div>
 
             {/* Register Button */}
             <button
@@ -283,16 +377,18 @@ const RegisterPage = () => {
           {/* Divider */}
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+
             <span className="text-xs font-medium uppercase tracking-wider text-gray-400">
               Or continue with
             </span>
+
             <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
           </div>
 
-          {/* Google Login */}
+          {/* Google Registration */}
           <button
             type="button"
-            onClick={handleGoogleLogin}
+            onClick={handleGoogleRegister}
             disabled={isGooglePending || isSubmitting}
             className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 transition-all duration-300 hover:border-[#C49A5A] hover:bg-[#F8F6F0] disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
           >
@@ -350,4 +446,3 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
-

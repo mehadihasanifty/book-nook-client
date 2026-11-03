@@ -22,25 +22,42 @@ const LoginPage = () => {
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (isSubmitting || isGooglePending) return;
+
     setErrorMessage("");
+
+    const trimmedEmail = email.trim().toLowerCase();
+
+    if (!trimmedEmail || !password) {
+      setErrorMessage("Please enter your email and password.");
+      return;
+    }
 
     try {
       setIsSubmitting(true);
 
-      const { error } = await authClient.signIn.email({
-        email,
+      const { data, error } = await authClient.signIn.email({
+        email: trimmedEmail,
         password,
+        rememberMe: true,
         callbackURL: "/",
       });
 
       if (error) {
+        console.error("Login Error:", error);
+
         setErrorMessage(
           error.message || "Invalid email or password. Please try again.",
         );
         return;
       }
 
-      router.push("/");
+      if (!data) {
+        setErrorMessage("Login failed. Please try again.");
+        return;
+      }
+
+      router.replace("/");
       router.refresh();
     } catch (error) {
       console.error("Login failed:", error);
@@ -52,6 +69,8 @@ const LoginPage = () => {
 
   // Handle Google Login
   const handleGoogleLogin = async () => {
+    if (isGooglePending || isSubmitting) return;
+
     setErrorMessage("");
 
     try {
@@ -63,14 +82,19 @@ const LoginPage = () => {
       });
 
       if (error) {
+        console.error("Google Login Error:", error);
+
         setErrorMessage(
           error.message || "Google authentication failed. Please try again.",
         );
+
         setIsGooglePending(false);
       }
     } catch (error) {
       console.error("Google login failed:", error);
+
       setErrorMessage("Unable to sign in with Google. Please try again.");
+
       setIsGooglePending(false);
     }
   };
@@ -126,6 +150,7 @@ const LoginPage = () => {
 
               <input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="example@email.com"
                 value={email}
@@ -157,6 +182,7 @@ const LoginPage = () => {
               <div className="relative">
                 <input
                   id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={password}

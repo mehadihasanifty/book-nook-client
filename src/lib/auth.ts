@@ -18,11 +18,12 @@ export const auth = betterAuth({
     client,
   }),
 
-  emailAndPassword: {
-    enabled: true,
-    minPasswordLength: 6,
-    maxPasswordLength: 128,
-  },
+ emailAndPassword: {
+  enabled: true,
+  minPasswordLength: 6,
+  maxPasswordLength: 128,
+  autoSignIn: false,
+},
 
   socialProviders: {
     google: {
