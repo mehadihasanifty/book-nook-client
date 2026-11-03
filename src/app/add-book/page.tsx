@@ -1,4 +1,5 @@
 "use client";
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -10,35 +11,54 @@ import {
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@heroui/react";
+import { apiRequest } from "@/lib/booknook-api";
+import { usePageTitle } from "@/lib/use-page-title";
 
 export default function AddBookPage() {
   const { data: session } = authClient.useSession();
   const user = session?.user;
-  // console.log(user);
+  const [imageUrl, setImageUrl] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  usePageTitle("Add a Book");
 
-  const handleAddBook = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+  const handleAddBook = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
-    const formData = new FormData(form);
-    const bookData = Object.fromEntries(formData.entries());
+    if (!imageUrl) return toast.danger("Upload a book cover before adding the book.");
+    const values = new FormData(form);
+    const bookData = Object.fromEntries(values.entries());
+    bookData.image = imageUrl;
+    bookData.totalCopies = Number(bookData.totalCopies);
+    setIsSaving(true);
+    try {
+      await apiRequest("/books", { method: "POST", body: JSON.stringify(bookData) });
+      form.reset();
+      setImageUrl("");
+      toast.success("Your book was added successfully! 📚");
+    } catch (error) {
+      toast.danger(error instanceof Error ? error.message : "Could not add this book.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
-    console.log(bookData);
-
-    const res = await fetch("http://localhost:8000/add-book", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(bookData),
-    });
-
-    const result = await res.json();
-    console.log(result);
-
-    form.reset();
-
-    toast.success("Your Book added successfully! 📚");
+  const uploadCover = async (file?: File) => {
+    if (!file) return;
+    setIsUploading(true);
+    const body = new FormData();
+    body.set("image", file);
+    try {
+      const response = await fetch("/api/upload", { method: "POST", body });
+      const result = await response.json();
+      if (!response.ok || !result.url) throw new Error(result.message || "Image upload failed.");
+      setImageUrl(result.url);
+      toast.success("Book cover uploaded.");
+    } catch (error) {
+      toast.danger(error instanceof Error ? error.message : "Image upload failed.");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const shelfNotes = [
@@ -149,6 +169,7 @@ export default function AddBookPage() {
                   id="title"
                   name="title"
                   type="text"
+                  required
                   placeholder="Enter book title"
                   className="w-full border-b-2 border-[#174D38]/15 bg-transparent pb-2.5 text-sm text-[#1D241D] outline-none transition-colors placeholder:font-serif placeholder:italic focus:border-[#174D38] dark:border-gray-700 dark:text-[#F5EFE3] dark:focus:border-[#D5B477] dark:placeholder:text-gray-500"
                 />
@@ -165,6 +186,7 @@ export default function AddBookPage() {
                   id="author"
                   name="author"
                   type="text"
+                  required
                   placeholder="Enter author name"
                   className="w-full border-b-2 border-[#174D38]/15 bg-transparent pb-2.5 text-sm text-[#1D241D] outline-none transition-colors placeholder:font-serif placeholder:italic focus:border-[#174D38] dark:border-gray-700 dark:text-[#F5EFE3] dark:focus:border-[#D5B477] dark:placeholder:text-gray-500"
                 />
@@ -182,9 +204,10 @@ export default function AddBookPage() {
                     id="category"
                     name="category"
                     defaultValue=""
+                    required
                     className="w-full appearance-none border-b-2 border-[#174D38]/15 bg-transparent pb-2.5 pr-6 text-sm text-[#3D4038] outline-none transition-colors focus:border-[#174D38] dark:border-gray-700 dark:text-gray-300 dark:focus:border-[#D5B477]"
                   >
-                    <option value="" disabled>
+                  <option value="" disabled>
                       Select a category
                     </option>
                     <option>Fiction</option>
@@ -213,6 +236,7 @@ export default function AddBookPage() {
                   name="totalCopies"
                   type="number"
                   min="1"
+                  required
                   placeholder="Enter total copies"
                   className="w-full border-b-2 border-[#174D38]/15 bg-transparent pb-2.5 text-sm text-[#1D241D] outline-none transition-colors placeholder:font-serif placeholder:italic focus:border-[#174D38] dark:border-gray-700 dark:text-[#F5EFE3] dark:focus:border-[#D5B477] dark:placeholder:text-gray-500"
                 />
@@ -224,15 +248,19 @@ export default function AddBookPage() {
                 htmlFor="image"
                 className="mb-1.5 block text-[11px] font-bold uppercase tracking-[1.6px] text-[#A18A62]"
               >
-                Book Cover Image URL
+                Book Cover Image
               </label>
               <input
                 id="image"
-                name="image"
-                type="url"
-                placeholder="https://example.com/book-cover.jpg"
+                name="coverFile"
+                type="file"
+                accept="image/*"
+                required={!imageUrl}
+                onChange={(event) => uploadCover(event.currentTarget.files?.[0])}
                 className="w-full border-b-2 border-[#174D38]/15 bg-transparent pb-2.5 text-sm text-[#1D241D] outline-none transition-colors placeholder:font-serif placeholder:italic focus:border-[#174D38] dark:border-gray-700 dark:text-[#F5EFE3] dark:focus:border-[#D5B477] dark:placeholder:text-gray-500"
               />
+              <input type="hidden" name="image" value={imageUrl} />
+              <p className="mt-2 text-xs text-[#A18A62]">{isUploading ? "Uploading cover…" : imageUrl ? "Cover uploaded successfully." : "Choose an image up to 10 MB. It will be uploaded to imgbb."}</p>
             </div>
 
             <div className="mt-7">
@@ -246,6 +274,7 @@ export default function AddBookPage() {
                 id="description"
                 name="description"
                 rows={4}
+                required
                 placeholder="Write a short description about the book..."
                 className="w-full resize-y border-b-2 border-[#174D38]/15 bg-transparent pb-2.5 text-sm text-[#1D241D] outline-none transition-colors placeholder:font-serif placeholder:italic focus:border-[#174D38] dark:border-gray-700 dark:text-[#F5EFE3] dark:focus:border-[#D5B477] dark:placeholder:text-gray-500"
               />
@@ -299,10 +328,11 @@ export default function AddBookPage() {
 
             <button
               type="submit"
+              disabled={isSaving || isUploading}
               className="mt-8 flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-full bg-[#174D38] px-5 py-3.5 text-sm font-semibold text-[#F5EFE3] shadow-md shadow-[#174D38]/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#103B2B] hover:shadow-lg dark:bg-[#D5B477] dark:text-[#173D2D] dark:hover:bg-[#E5C88F]"
             >
               <BookPlus size={18} />
-              Add Book
+              {isSaving ? "Adding Book…" : "Add Book"}
             </button>
 
             <p className="mt-4 text-center text-[11px] text-[#A18A62]">

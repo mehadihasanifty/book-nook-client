@@ -6,8 +6,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { usePageTitle } from "@/lib/use-page-title";
 
 const LoginPage = () => {
+  usePageTitle("Login");
   const router = useRouter();
 
   const [email, setEmail] = useState("");

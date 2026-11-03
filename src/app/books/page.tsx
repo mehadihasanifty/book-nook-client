@@ -10,6 +10,8 @@ import {
   Search,
   UserRound,
 } from "lucide-react";
+import { API_URL } from "@/lib/booknook-api";
+import { usePageTitle } from "@/lib/use-page-title";
 
 type Book = {
   _id?: string;
@@ -33,6 +35,7 @@ const categoryFilters = [
 ];
 
 const AllBooksPage = () => {
+  usePageTitle("All Books");
   const [books, setBooks] = useState<Book[]>([]);
   const [isPending, setIsPending] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +45,7 @@ const AllBooksPage = () => {
   useEffect(() => {
     const loadBooks = async () => {
       try {
-        const res = await fetch("http://localhost:8000/books");
+        const res = await fetch(`${API_URL}/books`, { cache: "no-store" });
 
         if (!res.ok) throw new Error("Failed to load the shelf");
 
@@ -182,7 +185,7 @@ const AllBooksPage = () => {
           {/* Books grid */}
           <div className="px-6 py-10 sm:px-10 lg:px-14">
             {isPending ? (
-              <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
                 {Array.from({ length: 10 }).map((_, i) => (
                   <div
                     key={i}
@@ -268,6 +271,14 @@ const AllBooksPage = () => {
                         <span className="text-[11px] font-medium italic text-[#A18A62]">
                           A shared read
                         </span>
+                      )}
+                      {book._id && (
+                        <Link
+                          href={`/books/${book._id}`}
+                          className="mt-4 flex w-full items-center justify-center rounded-full bg-[#174D38] px-4 py-2.5 text-xs font-semibold text-[#F5EFE3] transition hover:bg-[#103B2B] dark:bg-[#D5B477] dark:text-[#173D2D] dark:hover:bg-[#E5C88F]"
+                        >
+                          View Details
+                        </Link>
                       )}
                     </div>
                   </article>

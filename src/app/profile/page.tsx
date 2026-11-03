@@ -5,8 +5,10 @@ import { UserRound, Mail, BookOpen, LogOut, Library } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { usePageTitle } from "@/lib/use-page-title";
 
 export default function ProfilePage() {
+  usePageTitle("My Profile");
   const { data: session } = authClient.useSession();
   const user = session?.user;
   const router = useRouter();

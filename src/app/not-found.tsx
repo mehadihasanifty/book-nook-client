@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
+export const metadata = { title: "BookNook | Page Not Found" };
+
 export default function NotFound() {
   return (
     <main className="flex flex-1 items-center justify-center bg-[#FAF9F6] px-4 py-16 text-gray-900 transition-colors dark:bg-gray-950 dark:text-white">
