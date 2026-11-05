@@ -22,7 +22,7 @@ const NewArrivals = () => {
 
     const load = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/books?limit=6`, {
+        const res = await fetch(`${API_URL}/books?limit=6`, {
           cache: "no-store",
           signal: AbortSignal.timeout(10_000),
         });

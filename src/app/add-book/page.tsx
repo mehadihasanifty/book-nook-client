@@ -38,9 +38,9 @@ export default function AddBookPage() {
         method: "POST",
         body: JSON.stringify(bookData),
       });
-      form.reset();
-      setImageUrl("");
       toast.success("Your book was added successfully! 📚");
+      setImageUrl("");
+      form.reset();
     } catch (error) {
       toast.danger(
         error instanceof Error ? error.message : "Could not add this book.",

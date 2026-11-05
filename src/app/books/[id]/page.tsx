@@ -131,7 +131,7 @@ function BookDetails({ params }: { params: Promise<{ id: string }> }) {
     const run = async () => {
       try {
         const token = await getApiToken();
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/books/${id}`, {
+        const res = await fetch(`${API_URL}/books/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
           cache: "no-store",
         });

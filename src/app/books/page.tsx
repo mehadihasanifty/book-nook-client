@@ -45,7 +45,7 @@ const AllBooksPage = () => {
   useEffect(() => {
     const loadBooks = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/books`, { cache: "no-store" });
+        const res = await fetch(`${API_URL}/books`, { cache: "no-store" });
 
         if (!res.ok) throw new Error("Failed to load the shelf");
 
