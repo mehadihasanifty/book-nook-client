@@ -48,19 +48,30 @@ export default function MyBorrowsPage() {
   }, [loadBorrows]);
 
   const returnBook = async (id: string) => {
-    setReturning(id);
-    try {
-      await apiRequest(`${process.env.NEXT_PUBLIC_API_URL}/borrows/${id}`, { method: "DELETE" });
-      setItems((current) => current.filter((item) => item._id !== id));
-      toast.success("Book returned. Thank you for sharing it!");
-    } catch (error) {
-      toast.danger(
-        error instanceof Error ? error.message : "Could not return this book.",
-      );
-    } finally {
-      setReturning(null);
-    }
-  };
+  setReturning(id);
+
+  try {
+    await apiRequest(`/borrows/${id}`, {
+      method: "DELETE",
+    });
+
+    setItems((current) =>
+      current.filter((item) => item._id !== id),
+    );
+
+    toast.success("Book returned successfully!");
+  } catch (error) {
+    console.error("Return Book Error:", error);
+
+    toast.danger(
+      error instanceof Error
+        ? error.message
+        : "Could not return this book.",
+    );
+  } finally {
+    setReturning(null);
+  }
+};
 
   return (
     <main className="min-h-screen w-full bg-[#94ec8d] px-3 py-4 dark:bg-[#071F17] sm:px-5 sm:pb-16">
