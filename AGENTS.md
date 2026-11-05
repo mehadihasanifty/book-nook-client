@@ -11,8 +11,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Commands
 
 - `npm run dev` / `npm run build` (Turbopack) / `npm run lint` (`eslint`). No test suite exists.
+- `README.md` is stray create-next-app boilerplate — it points at non-existent paths (`app/`, Geist font); don't trust it.
 - Typecheck is **not** in npm scripts: run `npx tsc --noEmit`.
 - Prettier is **not** a dependency; format ad hoc with `npx prettier --write "src/**/*.{ts,tsx,css}"` and verify with `--check`. Verify order: `prettier --check` → `tsc --noEmit` → `next build`.
+- ESLint is clean and must stay that way: `eslint-config-next` plus React Compiler-aware hook rules (e.g. `react-hooks/set-state-in-effect` flagged our `useIsMobile`; kept clean via `useSyncExternalStore` in `src/hooks/use-mobile.ts`).
 
 ## Next 16 with `cacheComponents` (enabled in `next.config.ts` — read breaking-change rules above)
 
@@ -22,9 +24,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Backend is a separate project
 
-- Express/MongoDB API at `F:\Projects\book-nook-server` (port 5000, CORS allows `localhost:3000`). If not running, pages fail with `TypeError: Failed to fetch` — start it there with `npm run dev`.
+- Express/MongoDB API at `F:\Projects\book-nook-server` (port 5000, CORS allows `localhost:3000`). If not running, pages fail with `TypeError: Failed to fetch` — start it there with `npm run dev` (nodemon; plain `node index.js` never auto-reloads after edits).
 - `NEXT_PUBLIC_API_URL` (http://localhost:5000) comes from this repo's `.env`; never hardcode other base URLs.
-- `GET /books` is public. Everything else (`/books/:id`, `POST /books`, `/borrows`…) needs the Bearer token from `getApiToken()` (proxied through this app's `/api/token` route) or `apiRequest()` from `src/lib/booknook-api.ts`.
+- `GET /books` is public (supports `?limit=N` → newest-first by `addedDate`; used by the home page's New Arrivals). Everything else (`/books/:id`, `POST /books`, `/borrows`…) needs the Bearer token from `getApiToken()` (proxied through this app's `/api/token` route) or `apiRequest()` from `src/lib/booknook-api.ts`.
 
 ## Auth
 
@@ -35,4 +37,5 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - UI stack: HeroUI v3 (`toast.success`/`toast.danger`; global `<Toast.Provider>` already in `layout.tsx`), shadcn-style components in `src/components/ui`, lucide-react icons.
 - Every mutating user action (create/update/delete/auth/borrow) must surface toast feedback — established project-wide pattern; check that any new action includes success and failure toasts.
+- All data fetching happens client-side in `useEffect` (API returns plain JSON arrays; `my-books` filters by user email in the browser). Home-page sections under `src/app/component/` follow the same pattern (`NewArrivals.tsx` for reference) — keeping fetches client-side is why `/` stays fully static (○) under `cacheComponents`.
 - Styling uses the custom palette as hex values, not Tailwind theme slots: `#174D38` (green), `#D5B477` (gold), `#071F17`/`#0E241C` (dark surfaces). Keep new markup consistent with existing pages. `reactCompiler` is enabled, so keep hooks deterministic.

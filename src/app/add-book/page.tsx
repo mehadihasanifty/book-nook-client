@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@heroui/react";
-import { apiRequest } from "@/lib/booknook-api";
+import { apiRequest, API_URL } from "@/lib/booknook-api";
 import { usePageTitle } from "@/lib/use-page-title";
 
 export default function AddBookPage() {
@@ -34,7 +34,7 @@ export default function AddBookPage() {
     bookData.totalCopies = Number(bookData.totalCopies);
     setIsSaving(true);
     try {
-      await apiRequest("/books", {
+      await apiRequest(`${API_URL}/books`, {
         method: "POST",
         body: JSON.stringify(bookData),
       });

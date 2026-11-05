@@ -1,4 +1,5 @@
 import HeroBanner from "./component/HeroBanner";
+import NewArrivals from "./component/NewArrivals";
 import HowItWorks from "./component/HowItWorks";
 import ReaderReviews from "./component/ReaderReviews";
 import TopCategories from "./component/TopCategories";
@@ -12,6 +13,7 @@ export default function Home() {
   return (
     <div>
       <HeroBanner />
+      <NewArrivals />
       <HowItWorks />
       <TopCategories />
       <ReaderReviews />

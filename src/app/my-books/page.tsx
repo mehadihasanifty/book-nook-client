@@ -59,12 +59,9 @@ export default function MyBooksPage() {
   const saveBook = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!editing) return;
-    const values = Object.fromEntries(
-      new FormData(event.currentTarget).entries(),
-    );
-    values.totalCopies = Number(
-      values.totalCopies,
-    ) as unknown as FormDataEntryValue;
+    const values: Record<string, FormDataEntryValue | number> =
+      Object.fromEntries(new FormData(event.currentTarget).entries());
+    values.totalCopies = Number(values.totalCopies);
     setBusy(true);
     try {
       await apiRequest(`/books/${editing._id}`, {
