@@ -24,6 +24,7 @@ const NewArrivals = () => {
       try {
         const res = await fetch(`${API_URL}/books?limit=6`, {
           cache: "no-store",
+          signal: AbortSignal.timeout(10_000),
         });
         if (!res.ok) throw new Error("Failed to load the shelf");
         const data = await res.json();

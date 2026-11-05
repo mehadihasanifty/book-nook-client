@@ -25,7 +25,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Backend is a separate project
 
 - Express/MongoDB API at `F:\Projects\book-nook-server` (port 5000, CORS allows `localhost:3000`). If not running, pages fail with `TypeError: Failed to fetch` — start it there with `npm run dev` (nodemon; plain `node index.js` never auto-reloads after edits).
-- `NEXT_PUBLIC_API_URL` (http://localhost:5000) comes from this repo's `.env`; never hardcode other base URLs.
+- `NEXT_PUBLIC_API_URL` (http://localhost:5000) flows only through `API_URL` from `src/lib/booknook-api.ts` — don't reference the env var elsewhere. `apiRequest(path)` already prepends that base, so pass **relative** paths (`"/books"`); passing an absolute URL created a double-prefix bug (`http://localhost:5000http://localhost:5000/books`).
 - `GET /books` is public (supports `?limit=N` → newest-first by `addedDate`; used by the home page's New Arrivals). Everything else (`/books/:id`, `POST /books`, `/borrows`…) needs the Bearer token from `getApiToken()` (proxied through this app's `/api/token` route) or `apiRequest()` from `src/lib/booknook-api.ts`.
 
 ## Auth
