@@ -30,8 +30,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Auth
 
-- better-auth: server config `src/lib/auth.ts`, client `src/lib/auth-client.ts`, mounted at `src/app/api/auth/[...all]/route.ts`. Read session with `authClient.useSession()`.
+- better-auth: server config `src/lib/auth.ts` (reads `BETTER_AUTH_URL` and Vercel auto-injected `VERCEL_URL` for `baseURL`/`trustedOrigins`), client `src/lib/auth-client.ts`, mounted at `src/app/api/auth/[...all]/route.ts`. Read session with `authClient.useSession()`.
 - The auth middleware is `src/proxy.ts` (Next 16's middleware) and gates `/add-book`, `/my-books`, `/my-borrows`, `/books/:path*` → redirects unauthenticated requests to `/login` (raw `curl` of those pages returns 307 without a session cookie).
+
+## Deployment (Vercel + Render)
+
+- Client → Vercel (repo `github.com/mehadihasanifty/booknook-client`); the Express API can't run on Vercel — deploy `book-nook-server` as a Render Web Service (`github.com/mehadihasanifty/booknook-server`).
+- `.env` is never committed — all required vars must be filled manually in Vercel/Render from local `.env` values.
+- Vercel builds **fail without `MONGODB_URL`** in the build env: `src/lib/auth.ts` throws at module load, and middleware + `/api/*` routes import it. Set all env vars *before* the first build.
+- `NEXT_PUBLIC_API_URL` is **inlined at build time** — after changing it on Vercel you must rebuild/redeploy.
+- The API's CORS allow-list comes from `CLIENT_ORIGIN` in the backend env; deployed client origins must be listed there or every browser fetch is silently rejected (symptom: pages render but data never loads — "works on localhost, dead when deployed").
+- Also set `BETTER_AUTH_URL=https://<client-domain>`, `API_JWT_SECRET`, `IMGBB_API_KEY`, `GOOGLE_CLIENT_ID/SECRET` on both platforms; add the deployed origin + `/api/auth/callback/google` to Google OAuth redirect URIs.
 
 ## Conventions
 

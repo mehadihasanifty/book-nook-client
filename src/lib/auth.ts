@@ -13,7 +13,26 @@ const client = new MongoClient(mongoUrl);
 
 const db = client.db("book-nook");
 
+function getOrigin(value?: string) {
+  if (!value) return undefined;
+  try {
+    return new URL(value.includes("://") ? value : `https://${value}`).origin;
+  } catch {
+    return undefined;
+  }
+}
+
+const trustedOrigins = [
+  ...new Set(
+    [getOrigin(process.env.BETTER_AUTH_URL), getOrigin(process.env.VERCEL_URL)].filter(
+      (origin): origin is string => Boolean(origin),
+    ),
+  ),
+];
+
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL,
+  trustedOrigins,
   database: mongodbAdapter(db, {
     client,
   }),
