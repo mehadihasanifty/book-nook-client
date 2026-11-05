@@ -50,7 +50,7 @@ export default function MyBorrowsPage() {
   const returnBook = async (id: string) => {
     setReturning(id);
     try {
-      await apiRequest(`/borrows/${id}`, { method: "DELETE" });
+      await apiRequest(`${process.env.NEXT_PUBLIC_API_URL}/borrows/${id}`, { method: "DELETE" });
       setItems((current) => current.filter((item) => item._id !== id));
       toast.success("Book returned. Thank you for sharing it!");
     } catch (error) {

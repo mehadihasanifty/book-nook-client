@@ -35,7 +35,7 @@ export default function MyBooksPage() {
   const loadBooks = useCallback(async () => {
     if (!email) return;
     try {
-      const response = await fetch(`${API_URL}/books`, { cache: "no-store" });
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/books`, { cache: "no-store" });
       if (!response.ok) throw new Error("Could not load your books.");
       const all = await response.json();
       setBooks(
