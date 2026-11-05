@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, type FormEvent } from "react";
@@ -104,10 +103,8 @@ const LoginPage = () => {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#94ec8d] px-4 py-10 dark:bg-[#071F17] sm:px-6">
       <div className="w-full max-w-md">
-
         {/* Login Card */}
         <div className="rounded-2xl border border-[#EAE5D9] bg-white p-6 shadow-[0_15px_50px_rgba(23,77,56,0.07)] dark:border-gray-800 dark:bg-gray-900 sm:p-8">
-
           {/* Header */}
           <div className="mb-7 text-center">
             <Link href="/" className="inline-block">
@@ -140,7 +137,6 @@ const LoginPage = () => {
 
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-5">
-
             {/* Email */}
             <div>
               <label
@@ -197,16 +193,10 @@ const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={
-                    showPassword ? "Hide password" : "Show password"
-                  }
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-[#174D38] dark:hover:text-[#D5B477]"
                 >
-                  {showPassword ? (
-                    <EyeOff size={19} />
-                  ) : (
-                    <Eye size={19} />
-                  )}
+                  {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
                 </button>
               </div>
             </div>
@@ -265,7 +255,6 @@ const LoginPage = () => {
                     d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.14 1.45-4.88 2.3-8.18 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"
                   />
                 </svg>
-
                 Continue with Google
               </>
             )}

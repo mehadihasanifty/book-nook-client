@@ -25,19 +25,26 @@ export default function AddBookPage() {
   const handleAddBook = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
-    if (!imageUrl) return toast.danger("Upload a book cover before adding the book.");
+    if (!imageUrl)
+      return toast.danger("Upload a book cover before adding the book.");
     const values = new FormData(form);
-    const bookData = Object.fromEntries(values.entries());
+    const bookData: Record<string, FormDataEntryValue | number> =
+      Object.fromEntries(values.entries());
     bookData.image = imageUrl;
     bookData.totalCopies = Number(bookData.totalCopies);
     setIsSaving(true);
     try {
-      await apiRequest("/books", { method: "POST", body: JSON.stringify(bookData) });
+      await apiRequest("/books", {
+        method: "POST",
+        body: JSON.stringify(bookData),
+      });
       form.reset();
       setImageUrl("");
       toast.success("Your book was added successfully! 📚");
     } catch (error) {
-      toast.danger(error instanceof Error ? error.message : "Could not add this book.");
+      toast.danger(
+        error instanceof Error ? error.message : "Could not add this book.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -51,11 +58,14 @@ export default function AddBookPage() {
     try {
       const response = await fetch("/api/upload", { method: "POST", body });
       const result = await response.json();
-      if (!response.ok || !result.url) throw new Error(result.message || "Image upload failed.");
+      if (!response.ok || !result.url)
+        throw new Error(result.message || "Image upload failed.");
       setImageUrl(result.url);
       toast.success("Book cover uploaded.");
     } catch (error) {
-      toast.danger(error instanceof Error ? error.message : "Image upload failed.");
+      toast.danger(
+        error instanceof Error ? error.message : "Image upload failed.",
+      );
     } finally {
       setIsUploading(false);
     }
@@ -207,14 +217,28 @@ export default function AddBookPage() {
                     required
                     className="w-full appearance-none border-b-2 border-[#174D38]/15 bg-[#FFFEFA] pb-2.5 pr-6 text-sm text-[#1D241D] outline-none transition-colors focus:border-[#174D38] dark:border-gray-700 dark:bg-[#0E241C] dark:text-[#F5EFE3] dark:focus:border-[#D5B477]"
                   >
-                  <option value="" disabled className="bg-[#F4F4F0] text-[#6B6F63]">
+                    <option
+                      value=""
+                      disabled
+                      className="bg-[#F4F4F0] text-[#6B6F63]"
+                    >
                       Select a category
                     </option>
-                    <option className="bg-[#FFFEFA] text-[#1D241D]">Fiction</option>
-                    <option className="bg-[#FFFEFA] text-[#1D241D]">Science</option>
-                    <option className="bg-[#FFFEFA] text-[#1D241D]">History</option>
-                    <option className="bg-[#FFFEFA] text-[#1D241D]">Kids</option>
-                    <option className="bg-[#FFFEFA] text-[#1D241D]">Others</option>
+                    <option className="bg-[#FFFEFA] text-[#1D241D]">
+                      Fiction
+                    </option>
+                    <option className="bg-[#FFFEFA] text-[#1D241D]">
+                      Science
+                    </option>
+                    <option className="bg-[#FFFEFA] text-[#1D241D]">
+                      History
+                    </option>
+                    <option className="bg-[#FFFEFA] text-[#1D241D]">
+                      Kids
+                    </option>
+                    <option className="bg-[#FFFEFA] text-[#1D241D]">
+                      Others
+                    </option>
                   </select>
 
                   <ChevronDown
@@ -256,11 +280,19 @@ export default function AddBookPage() {
                 type="file"
                 accept="image/*"
                 required={!imageUrl}
-                onChange={(event) => uploadCover(event.currentTarget.files?.[0])}
+                onChange={(event) =>
+                  uploadCover(event.currentTarget.files?.[0])
+                }
                 className="w-full border-b-2 border-[#174D38]/15 bg-transparent pb-2.5 text-sm text-[#1D241D] outline-none transition-colors placeholder:font-serif placeholder:italic focus:border-[#174D38] dark:border-gray-700 dark:text-[#F5EFE3] dark:focus:border-[#D5B477] dark:placeholder:text-gray-500"
               />
               <input type="hidden" name="image" value={imageUrl} />
-              <p className="mt-2 text-xs text-[#A18A62]">{isUploading ? "Uploading cover…" : imageUrl ? "Cover uploaded successfully." : "Choose an image up to 10 MB. It will be uploaded to imgbb."}</p>
+              <p className="mt-2 text-xs text-[#A18A62]">
+                {isUploading
+                  ? "Uploading cover…"
+                  : imageUrl
+                    ? "Cover uploaded successfully."
+                    : "Choose an image up to 10 MB. It will be uploaded to imgbb."}
+              </p>
             </div>
 
             <div className="mt-7">

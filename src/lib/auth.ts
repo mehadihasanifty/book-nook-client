@@ -1,4 +1,3 @@
-
 import { betterAuth } from "better-auth";
 import { jwt } from "better-auth/plugins";
 import { MongoClient } from "mongodb";
@@ -19,12 +18,12 @@ export const auth = betterAuth({
     client,
   }),
 
- emailAndPassword: {
-  enabled: true,
-  minPasswordLength: 6,
-  maxPasswordLength: 128,
-  autoSignIn: false,
-},
+  emailAndPassword: {
+    enabled: true,
+    minPasswordLength: 6,
+    maxPasswordLength: 128,
+    autoSignIn: false,
+  },
 
   socialProviders: {
     google: {
@@ -41,4 +40,3 @@ export const auth = betterAuth({
     },
   },
 });
- 

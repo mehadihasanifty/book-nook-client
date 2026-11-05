@@ -107,7 +107,6 @@ const Navbar = () => {
             aria-expanded={isMenuOpen}
             className="flex h-12 w-16 cursor-pointer items-center justify-center rounded-[1.1rem] border border-[#ECEAE2] bg-white text-[#1D241D] shadow-sm transition-all duration-300 hover:border-[#C49A5A]/60 hover:bg-[#F8F6F0] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 lg:hidden"
           >
-            
             {isMenuOpen ? (
               <X size={22} strokeWidth={2.5} />
             ) : (

@@ -1,12 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import {
-  ArrowUpRight,
-  Clock,
-  Mail,
-  MapPin,
-  Phone,
-} from "lucide-react";
+import { ArrowUpRight, Clock, Mail, MapPin, Phone } from "lucide-react";
 import { FaFacebookF, FaGithub, FaInstagram } from "react-icons/fa";
 
 const Footer = () => {

@@ -199,14 +199,20 @@ const AllBooksPage = () => {
               </div>
             ) : error ? (
               <div className="flex flex-col items-center justify-center gap-4 rounded-[1.5rem] border border-[#B64C43]/20 bg-[#B64C43]/5 px-6 py-16 text-center dark:border-red-400/20 dark:bg-red-950/20">
-                <BookSearch size={34} className="text-[#B64C43] dark:text-red-400" />
+                <BookSearch
+                  size={34}
+                  className="text-[#B64C43] dark:text-red-400"
+                />
                 <p className="text-sm font-medium text-[#B64C43] dark:text-red-400">
                   {error}
                 </p>
               </div>
             ) : filteredBooks.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-4 rounded-[1.5rem] border border-[#174D38]/15 bg-[#174D38]/5 px-6 py-16 text-center dark:border-gray-800 dark:bg-white/[0.02]">
-                <BookOpen size={34} className="text-[#174D38] dark:text-[#D5B477]" />
+                <BookOpen
+                  size={34}
+                  className="text-[#174D38] dark:text-[#D5B477]"
+                />
                 <p className="font-serif text-lg font-semibold text-[#1D241D] dark:text-[#F5EFE3]">
                   Nothing on this part of the shelf yet
                 </p>
@@ -261,7 +267,10 @@ const AllBooksPage = () => {
                     </h2>
 
                     <p className="mb-3 flex items-center gap-1.5 text-[12px] font-medium text-[#6B6F63] dark:text-gray-400">
-                      <UserRound size={12} className="shrink-0 text-[#C49A5A]" />
+                      <UserRound
+                        size={12}
+                        className="shrink-0 text-[#C49A5A]"
+                      />
                       <span className="truncate">{book.author}</span>
                     </p>
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Navbar from "./component/Navbar";
@@ -30,7 +31,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       {/*${geistSans.variable} ${geistMono.variable} */}
       <body className="min-h-screen flex flex-col dark:bg-[#071F17]">
         <Toast.Provider placement="top end" />
-        <Navbar />
+        <Suspense fallback={null}>
+          <Navbar />
+        </Suspense>
         <main>{children}</main>
         <Footer />
       </body>

@@ -3,14 +3,23 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
-const encode = (value: unknown) => Buffer.from(JSON.stringify(value)).toString("base64url");
+const encode = (value: unknown) =>
+  Buffer.from(JSON.stringify(value)).toString("base64url");
 
 export async function GET() {
   const secret = process.env.API_JWT_SECRET;
-  if (!secret) return NextResponse.json({ message: "API_JWT_SECRET is not configured." }, { status: 500 });
+  if (!secret)
+    return NextResponse.json(
+      { message: "API_JWT_SECRET is not configured." },
+      { status: 500 },
+    );
 
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user?.email) return NextResponse.json({ message: "Please sign in first." }, { status: 401 });
+  if (!session?.user?.email)
+    return NextResponse.json(
+      { message: "Please sign in first." },
+      { status: 401 },
+    );
 
   const now = Math.floor(Date.now() / 1000);
   const header = encode({ alg: "HS256", typ: "JWT" });
@@ -22,6 +31,8 @@ export async function GET() {
     exp: now + 60 * 60,
   });
   const unsigned = `${header}.${payload}`;
-  const signature = createHmac("sha256", secret).update(unsigned).digest("base64url");
+  const signature = createHmac("sha256", secret)
+    .update(unsigned)
+    .digest("base64url");
   return NextResponse.json({ token: `${unsigned}.${signature}` });
 }
