@@ -189,7 +189,7 @@ function BookDetails({ params }: { params: Promise<{ id: string }> }) {
     body = (
       <article className="grid overflow-hidden rounded-[2.5rem] border border-[#ECEAE2] bg-[#FFFEFA] shadow-[0_18px_50px_rgba(23,77,56,0.12)] dark:border-gray-800 dark:bg-[#0E241C] md:grid-cols-[0.8fr_1.2fr]">
         <div
-          className="min-h-80 bg-linear-to-br from-[#174D38] to-[#071F17] bg-cover bg-center md:min-h-[560px]"
+          className="min-h-80 bg-linear-to-br from-[#174D38] to-[#071F17] bg-cover bg-center md:min-h-140"
           style={
             book.image ? { backgroundImage: `url('${book.image}')` } : undefined
           }
@@ -209,7 +209,7 @@ function BookDetails({ params }: { params: Promise<{ id: string }> }) {
           <p className="mt-7 whitespace-pre-wrap text-sm leading-7 text-[#55584E] dark:text-gray-300">
             {book.description}
           </p>
-          <div className="mt-7 grid gap-3 rounded-2xl border border-[#174D38]/10 bg-[#174D38]/5 p-5 text-sm dark:border-gray-800 dark:bg-white/[0.03]">
+          <div className="mt-7 grid gap-3 rounded-2xl border border-[#174D38]/10 bg-[#174D38]/5 p-5 text-white dark:border-gray-800 dark:bg-white/5">
             <p>
               <span className="font-semibold text-[#174D38] dark:text-[#D5B477]">
                 Added by
