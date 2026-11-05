@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { UserRound, Mail, BookOpen, LogOut, Library } from "lucide-react";
+import { toast } from "@heroui/react";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,8 +15,21 @@ export default function ProfilePage() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await authClient.signOut();
-    router.push("/");
+    try {
+      const { error } = await authClient.signOut();
+
+      if (error) {
+        console.error("Logout failed:", error.message);
+        toast.danger(error.message || "Could not sign out. Please try again.");
+        return;
+      }
+
+      toast.success("You are signed out. See you at the shelf!");
+      router.push("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.danger("Something went wrong while signing out. Please try again.");
+    }
   };
 
   const detailRows = [

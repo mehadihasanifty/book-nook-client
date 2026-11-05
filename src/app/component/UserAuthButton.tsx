@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Popover } from "@heroui/react";
 import { ChevronDown, LogOut, UserRound } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "@heroui/react";
 
 interface UserAuthUser {
   name?: string | null;
@@ -39,15 +40,18 @@ const UserAuthButtons = ({
 
       if (error) {
         console.error("Logout failed:", error.message);
+        toast.danger(error.message || "Could not sign out. Please try again.");
         return;
       }
 
       setIsOpen(false);
       onNavigate?.();
+      toast.success("You are signed out. See you at the shelf!");
       router.push("/");
       router.refresh();
     } catch (error) {
       console.error("Logout failed:", error);
+      toast.danger("Something went wrong while signing out. Please try again.");
     }
   };
 

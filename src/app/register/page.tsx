@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "@heroui/react";
 import { authClient } from "@/lib/auth-client";
 import { usePageTitle } from "@/lib/use-page-title";
 
@@ -83,22 +84,27 @@ const RegisterPage = () => {
       if (error) {
         console.error("Registration Error:", error);
 
-        setErrorMessage(
-          error.message || "Registration failed. Please try again.",
-        );
+        const message =
+          error.message || "Registration failed. Please try again.";
+
+        toast.danger(message);
+        setErrorMessage(message);
         return;
       }
 
       if (!data) {
+        toast.danger("Unable to create your account. Please try again.");
         setErrorMessage("Unable to create your account. Please try again.");
         return;
       }
 
+      toast.success("Account created successfully. Please sign in.");
       router.replace("/login");
       router.refresh();
     } catch (error) {
       console.error("Registration failed:", error);
 
+      toast.danger("Something went wrong. Please try again.");
       setErrorMessage("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -122,15 +128,18 @@ const RegisterPage = () => {
       if (error) {
         console.error("Google Registration Error:", error);
 
-        setErrorMessage(
-          error.message || "Google authentication failed. Please try again.",
-        );
+        const message =
+          error.message || "Google authentication failed. Please try again.";
+
+        toast.danger(message);
+        setErrorMessage(message);
 
         setIsGooglePending(false);
       }
     } catch (error) {
       console.error("Google registration failed:", error);
 
+      toast.danger("Unable to sign in with Google. Please try again.");
       setErrorMessage("Unable to sign in with Google. Please try again.");
 
       setIsGooglePending(false);

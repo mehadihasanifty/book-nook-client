@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "@heroui/react";
 import { authClient } from "@/lib/auth-client";
 import { usePageTitle } from "@/lib/use-page-title";
 
@@ -47,21 +48,26 @@ const LoginPage = () => {
       if (error) {
         console.error("Login Error:", error);
 
-        setErrorMessage(
-          error.message || "Invalid email or password. Please try again.",
-        );
+        const message =
+          error.message || "Invalid email or password. Please try again.";
+
+        toast.danger(message);
+        setErrorMessage(message);
         return;
       }
 
       if (!data) {
+        toast.danger("Login failed. Please try again.");
         setErrorMessage("Login failed. Please try again.");
         return;
       }
 
+      toast.success("Welcome back! You are now signed in.");
       router.replace("/");
       router.refresh();
     } catch (error) {
       console.error("Login failed:", error);
+      toast.danger("Something went wrong. Please try again.");
       setErrorMessage("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -85,15 +91,18 @@ const LoginPage = () => {
       if (error) {
         console.error("Google Login Error:", error);
 
-        setErrorMessage(
-          error.message || "Google authentication failed. Please try again.",
-        );
+        const message =
+          error.message || "Google authentication failed. Please try again.";
+
+        toast.danger(message);
+        setErrorMessage(message);
 
         setIsGooglePending(false);
       }
     } catch (error) {
       console.error("Google login failed:", error);
 
+      toast.danger("Unable to sign in with Google. Please try again.");
       setErrorMessage("Unable to sign in with Google. Please try again.");
 
       setIsGooglePending(false);
